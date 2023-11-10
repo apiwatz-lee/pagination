@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import MenuData from "./data/MenuData";
+import Card from "./components/Card";
+import PageButton from "./components/PageButton";
 
 function App() {
   const [menu, setMenu] = useState(MenuData);
@@ -10,7 +12,7 @@ function App() {
   const pagination = () => {
     //วิธีการคำนวนจำนวนหน้า
     // จำนวนหน้า = จำนวนรายการทั้งหมด / จำนวนรายการที่ต้องการแสดงต่อหน้า
-    const foodPerPage = 3; //จำนวนรายการที่เราต้องการแสดงในแต่ละหน้า
+    const foodPerPage = 4; //จำนวนรายการที่เราต้องการแสดงในแต่ละหน้า
     const numberOfFood = MenuData.length; //จำนวนรายการทั้งหมด
     const pages = Math.ceil(numberOfFood / foodPerPage); //จำนวนหน้า
     console.log("page", pages);
@@ -35,9 +37,9 @@ function App() {
   };
 
   useEffect(() => {
-    const paginate = pagination();
-    setFoodInPage(paginate);
-    setMenu(paginate[page]);
+    const paginate = pagination(); //ฟังชั่นนี้จะทำกา่ร return ชุดข้อมูล Array แต่ละหน้า
+    setFoodInPage(paginate); //นำไปเก็บไว้ใน State เพื่อทำการ Map page button
+    setMenu(paginate[page]); //นำชุดข้อมูลในแต่ละหน้าไป Map
   }, [page]);
 
   const handlePage = (index) => {
@@ -49,35 +51,18 @@ function App() {
       <h1 className="text-3xl font-bold my-10">FoodCard | Pagination</h1>
       <div className="container w-[90%] h-auto flex flex-row flex-wrap justify-center gap-6 mb-10">
         {menu.map((item, index) => {
-          return (
-            <div
-              className="card w-[300px] h-[350px] flex flex-col justify-center items-center gap-10 bg-white rounded-lg"
-              key={index}
-            >
-              <img
-                src={item.image_url}
-                alt={item.name}
-                className="w-[250px] h-[200px] object-cover rounded-md"
-              />
-              <h1 className="text-center text-black text-xl font-bold">
-                {item.name}
-              </h1>
-            </div>
-          );
+          return <Card {...item} key={index} />;
         })}
       </div>
       <div className="m-5 flex gap-5">
         {foodInPage.map((item, index) => {
           return (
-            <button
+            <PageButton
+              index={index}
               key={index}
-              className={`border px-2 py-1 w-9 rounded-full font-bold ${
-                index === page ? `bg-amber-600` : null
-              }`}
-              onClick={() => handlePage(index)}
-            >
-              {index + 1}
-            </button>
+              handlePage={handlePage}
+              page={page}
+            />
           );
         })}
       </div>
